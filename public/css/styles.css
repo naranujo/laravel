@@ -1,0 +1,228 @@
+/* Developed by harpitoweb.com to paolacamano.com.ar
+
+
+COLORES:
+------------------- 
+- verde: #133b3c
+- marron: #a99c6b
+- gris: #f2f2f2
+- blanco: #ffffff
+
+
+INDICE 
+-------------------
+- generales
+- bootstrap
+- header
+- footer
+- main
+
+
+/*******************generales**************************/
+
+/* FUENTES*/
+@import url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@300;400;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Hepta+Slab:wght@400;700&display=swap');
+
+body{font-family:'Hepta Slab', Arial, sans-serif;font-weight:400}
+header, h6{font-family:'Comfortaa', Arial, Helvetica, sans-serif;font-weight:600;letter-spacing:0.5px}
+
+footer {
+	height: 100px;
+	margin: 0;
+}
+
+main {
+	min-height: calc(100vh - 170px);
+}
+
+#password {
+	border: none;
+	box-shadow: none !important;
+}
+
+.input-group {
+	border-radius: 0.25rem;
+	border: 1px solid rgb(207,212,217) !important;
+	transition: .15s ease-in-out;
+}
+
+.input-group-selected {
+	border-radius: 0.25rem;
+	box-shadow : 0 0 0 0.2rem rgba(0,123,255,.25);
+	border : 1px solid #80bdff !important;
+}
+
+.border-secondary {
+	border-color: #a99c6b !important;
+}
+
+.text-bold {
+	font-weight: 600;
+}
+
+.text-underlined {
+	text-decoration: underline;
+}
+
+html { scroll-behavior: smooth;}
+html, body{color:#133b3c;line-height:1.4;font-size:16px;overflow-x:hidden;}
+
+.font-normal{font-style: normal}
+b{font-weight:600!important}
+#content,#main{overflow-y:hidden}
+.rounded-top-left{ border-top-left-radius:100px}
+.rounded-top-right{ border-top-right-radius:100px}
+.flor{width:60px;vertical-align:middle}
+.half-tree{width:80px;vertical-align:middle}
+h2,.h2{font-size:30px;vertical-align:middle;font-weight:400}
+.titulo h2, .titulo .h2{padding-left:15px!important}
+.titulo h6{padding-left:75px}
+.circle{display:inline-block;width:5px;height:5px;vertical-align:middle;border-radius:10px}
+main h2, .bg-primary p,.bg-white p,.bg-light p,hr{max-width:600px}
+.bg-primary hr{border-color:#999;margin:30px 0}
+
+/********************bootstrap**************************/
+
+@media (min-width: 1400px){
+ .container {max-width:1300px}
+}
+@media (min-width: 1500px){
+ .container {max-width:1400px}
+}
+@media (min-width: 1600px){
+ .container {max-width:1500px}
+}
+.bg-primary{background-color:#133b3c !important}
+.text-primary{color:#133b3c !important}
+.bg-secondary{background-color:#a99c6b !important}
+.text-secondary{color:#a99c6b !important}
+.col-md-6,.col-12{padding:0}
+.bg-light{background-color:#f2f2f2!important}
+.text-black{color:#333!important}
+
+/******************** header****************************/
+
+header{font-weight:600;font-size:14px;}
+
+/*menu	*/
+.navbar .nav-item a{color:#fff !important}
+.navbar .nav-item a:hover{text-decoration:underline}
+.navbar .nav-item.active a,.navbar .nav-item a.current,.navbar .nav-item a.active{text-decoration:underline}
+.navbar-toggler .bar{width:30px;height:1px;background:#f2f2f2;margin:10px;display:block}
+.navbar-toggler{outline:1;padding:3px}
+.navbar-toggler.collapsed{border:0;outline:0}
+.navbar-collapse{padding:5px 0px}
+.nav-item{padding:5px 0px}
+
+/********************footer******************************/
+
+#contacto .socials a:hover{font-size:26px;margin-top:-8px;margin-left:-2px;}
+
+
+/**********************main******************************/
+
+#confianza {margin-top:-350px;z-index:10;position:relative}
+
+/*slider*/
+.logov{max-height:100px}
+.carousel-inner h1,.carousel-inner h2{font-weight:300;font-size:33px}
+.carousel-inner p{margin:0 auto;max-width:450px}
+.carousel-inner .boton{color:#FFF;border:1px solid #fff;border-radius:20px;padding:4px 20px 2px;font-weight:400;font-size:13px}
+.linea-v{height:25px;width:1px;background:#FFF;display:block;margin:12px auto;}
+.carousel-inner small{letter-spacing:0.5px}
+@media (min-width: 768px){.carousel-inner .col-md-6{height:550px}}
+/* @media (min-width: 1200px){
+.carousel-inner{max-height:550px;overflow:hidden}
+}
+@media (min-width: 1400px){
+.carousel-inner{max-height:600px;overflow:hidden}
+}
+@media (min-width: 1600px){
+.carousel-inner{max-height:700px;overflow:hidden}
+}
+@media (min-width: 1900px){
+.carousel-inner{max-height:800px;overflow:hidden}
+}
+*/
+.carousel-indicators{max-width:50%;text-align:center;margin:0px -10px 20px;}
+.carousel-indicators li{margin:5px;width:12px;height:12px;border-radius:50px;border:1px solid #999;opacity:1;background:none}
+.carousel-indicators li.active:before{content:" ";display:block;width:6px;height:6px;margin:3px;border-radius:50px;background:#a99c6b}
+
+#location .mapa{margin-right:-30px;width:110%}
+
+#contacto .flor{margin-top:-10px}
+@media (max-width: 1200px){
+	.carousel-inner h1,.carousel-inner h2{font-size:28px}
+}
+@media (max-width: 991px){
+	.carousel-inner h2{font-size:21px;padding:15px}
+	.carousel-inner p{padding:0px 15px;font-size:15px}
+	.logov{max-height:80px}
+	.linea-v{height:15px;margin-bottom:5px}
+	#location .mapa{margin-right:0px;width:100%}
+}
+@media (max-width: 767px){
+	.carousel-inner .col-md-6{height:400px}
+	.carousel-inner .col-md-6:first-of-type{height:400px}
+	.carousel-indicators {top:385px;bottom:auto;max-width:100%;margin-left:0}
+	.carousel-inner p{font-size:14px}
+	.carousel-inner .boton{font-size:12px}
+	.carousel-inner h2{line-height:1.1}
+	.titulo{padding-right:10px}
+	.fadeCelu{animation: fadeIn ease 1s; -webkit-animation: fadeIn ease 1s; -moz-animation: fadeIn ease 1s;
+		-o-animation: fadeIn ease 1s; -ms-animation: fadeIn ease 1s;}
+	.carousel-inner .linea-v{display:none}
+	.carousel-inner .logov{margin-bottom:5px}
+	.carousel-inner{padding-top:10px!important}
+}
+@media (max-width: 469px){
+	.carousel-inner .col-md-6{height:330px}
+	.carousel-inner .col-md-6:first-of-type{height:330px}
+	.carousel-indicators {top:315px;}
+	.carousel-inner h2{font-size:16px;padding:10px!important}
+	.carousel-inner small{font-size:70%}
+	.carousel-inner .boton{font-size:11px}
+}
+@media (max-width: 359px){
+	.carousel-inner h2{line-height:1.1;margin:0px}
+	.carousel-inner p{margin-bottom:10px!important}
+		}
+@media (max-width: 379px){
+	.titulo h6,#servicios h5{font-size:14px;padding-left:70px}
+	.titulo .h2,.titulo h2,#servicios h2{font-size:20px;padding-left:10px !important}
+}
+
+.fade-in {
+animation: fadeIn ease 5s;
+-webkit-animation: fadeIn ease 5s;
+-moz-animation: fadeIn ease 5s;
+-o-animation: fadeIn ease 5s;
+-ms-animation: fadeIn ease 5s;
+}
+
+@keyframes fadeIn {
+0% {opacity:0;}
+100% {opacity:1;}
+}
+
+@-moz-keyframes fadeIn {
+0% {opacity:0;}
+100% {opacity:1;}
+}
+
+@-webkit-keyframes fadeIn {
+0% {opacity:0;}
+100% {opacity:1;}
+}
+
+@-o-keyframes fadeIn {
+0% {opacity:0;}
+100% {opacity:1;}
+}
+
+@-ms-keyframes fadeIn {
+0% {opacity:0;}
+100% {opacity:1;}
+}
+
