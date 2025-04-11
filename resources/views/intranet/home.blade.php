@@ -2,29 +2,11 @@
 
 @extends('layouts.intranet')
 
-@php
-    $sinNovedades = [
-        'es' => 'No hay novedades',
-        'en' => 'No news'
-    ];
-
-    $novedades = [
-        'es' => 'Novedades',
-        'en' => 'News'
-    ];
-
-    $leerMas = [
-        'es' => 'Leer más',
-        'en' => 'Read more'
-    ];
-
-    $hasMorePosts = true;
-    $page = 1;
-    
-@endphp
-
 @section('title')
     <h1 class="pt-5">{{ $title }}</h1>
+@endsection
+
+@section('content')
     <!-- Inicio carrusel -->
     @if (count($carrouselPosts) == 0)
         <h6 class="text-primary mx-auto">{{ $sinNovedades[$lang] }}</h6>

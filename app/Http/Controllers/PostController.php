@@ -78,20 +78,49 @@ class PostController extends Controller {
             'pt' => 'Sair'
         ];
 
+        $sinNovedades = [
+            'es' => 'No hay novedades',
+            'en' => 'No news'
+        ];
+    
+        $novedades = [
+            'es' => 'Novedades',
+            'en' => 'News'
+        ];
+    
+        $leerMas = [
+            'es' => 'Leer más',
+            'en' => 'Read more'
+        ];
+    
+        $page = 1;
+        
         // Los 3 más nuevos
-        $carrouselPosts = Post::where('status', '=', 'draft')
-            ->with('sections')
-            ->orderBy('created_at', 'desc')
+        $carrouselPosts = Post::orderBy('created_at', 'desc')
             ->take(3)
+            ->get();
+            
+        // El resto (sin incluir los 3 más nuevos)
+        $remainingCount = Post::count() - 3;
+        $posts = Post::orderBy('created_at', 'desc')
+            ->skip(3)
+            ->take($remainingCount > 0 ? $remainingCount : 0)
             ->get();
 
-        // El resto (sin incluir los 3 más nuevos)
-        $posts = Post::where('status', '=', 'draft')
-            ->with('sections')
-            ->orderBy('created_at', 'desc')
-            ->skip(3)
-            ->take(3)
-            ->get();
+        foreach ($posts as $post) {
+            $post->setAttribute('title', str_replace('<p>', '', $post->title));
+            $post->setAttribute('title', str_replace('</p>', '', $post->title));
+            $post->setAttribute('resume', str_replace('<p>', '', $post->resume));
+            $post->setAttribute('resume', str_replace('</p>', '', $post->resume));
+        }
+        foreach ($carrouselPosts as $post) {
+            $post->setAttribute('title', str_replace('<p>', '', $post->title));
+            $post->setAttribute('title', str_replace('</p>', '', $post->title));
+            $post->setAttribute('resume', str_replace('<p>', '', $post->resume));
+            $post->setAttribute('resume', str_replace('</p>', '', $post->resume));
+        }
+        
+        $hasMorePosts = Post::count() > 5;
 
         return view('intranet.home', [
             'lang' => $this->lang ?? 'es',
@@ -107,7 +136,12 @@ class PostController extends Controller {
             'logoutLabel' => $this->logoutLabel[$this->lang],
             'usersAdminLabel' => $this->usersAdminLabel[$this->lang],
             'carrouselPosts' => $carrouselPosts,
-            'posts' => $posts
+            'posts' => $posts,
+            'sinNovedades' => $sinNovedades,
+            'novedades' => $novedades,
+            'leerMas' => $leerMas,
+            'page' => $page,
+            'hasMorePosts' => $hasMorePosts,
         ]);
     }
 
@@ -313,6 +347,8 @@ class PostController extends Controller {
 
         $post->setAttribute('title', str_replace('<p>', '', $post->title));
         $post->setAttribute('title', str_replace('</p>', '', $post->title));
+        $post->setAttribute('resume', str_replace('<p>', '', $post->resume));
+        $post->setAttribute('resume', str_replace('</p>', '', $post->resume));
 
         foreach ($post->sections as $section) {
             $section->setAttribute('title', str_replace('<p>', '', $section->title));
@@ -320,6 +356,7 @@ class PostController extends Controller {
             $section->setAttribute('content', str_replace('<p>', '', $section->content));
             $section->setAttribute('content', str_replace('</p>', '', $section->content));
             $section->setAttribute('content', str_replace('<ul>', '<ul class="text-justify ml-2" style="line-height: 2;">', $section->content));
+            $section->setAttribute('content', str_replace('<ol>', '<ol class="text-justify ml-2" style="line-height: 2;">', $section->content));
         }
 
         $sections = [];
