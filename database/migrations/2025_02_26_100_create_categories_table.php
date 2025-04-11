@@ -16,6 +16,14 @@ return new class extends Migration
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->useCurrent();
         });
+
+        DB::table('categories')->insert([
+            ['name' => 'Category 1'],
+            ['name' => 'Category 2'],
+            ['name' => 'Category 3'],
+            ['name' => 'Category 4'],
+            ['name' => 'Category 5'],
+        ]);
     }
 
     /**
@@ -25,4 +33,5 @@ return new class extends Migration
     {
         Schema::dropIfExists('categories');
     }
+
 };

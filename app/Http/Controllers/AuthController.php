@@ -245,7 +245,13 @@ class AuthController extends Controller {
         if ($user) {
             // Check if password is correct
             if (password_verify($password, $user->password)) {
+
+                User::where('email', $email)->update(['last_login' => now()]);
+
+                $user = User::where('email', $email)->first();
+
                 session(['user' => $user]);
+                
                 return redirect()->route('view.intranet');
             }
         }

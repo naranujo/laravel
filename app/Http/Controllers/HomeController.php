@@ -3,6 +3,10 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
+
+use App\Models\Post;
+use App\Models\Section;
 
 class HomeController extends Controller
 {
@@ -506,7 +510,316 @@ class HomeController extends Controller
     }
 
     public function news() {
-        return view('news');
+        $lang = $_GET['lang'] ?? 'es';
+        
+        $title = [
+            'es' => 'Novedades',
+            'en' => 'News',
+            'pt' => 'Notícias'
+        ];
+
+        $title = $title[$lang];
+
+        $description = array(
+            'es' => 'Bienvenido a la página de inicio',
+            'en' => 'Welcome to the home page',
+            'pt' => 'Bem-vindo à página inicial',
+        );
+
+        $description = $description[$lang];
+
+        $template="default";
+
+        $title0 = array(
+            'es' => 'Inicio',
+            'en' => 'Home',
+            'pt' => 'Início',
+        );
+
+        $title1 = array(
+            'es' => 'Nosotros',
+            'en' => 'About us',
+            'pt' => 'Sobre nós',
+        );
+
+        $title2 = array(
+            'es' => 'Clientes',
+            'en' => 'Clients',
+            'pt' => 'Clientes',
+        );
+
+        $title3 = array(
+            'es' => 'Servicios',
+            'en' => 'Services',
+            'pt' => 'Serviços',
+        );
+
+        $title4 = array(
+            'es' => 'Contacto',
+            'en' => 'Contact',
+            'pt' => 'Contato',
+        );
+
+        $title5 = array(
+            'es' => 'Novedades',
+            'en' => 'News',
+            'pt' => 'Notícias',
+        );
+
+        $posts = Post::where('status', 'draft')
+            ->with('sections')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        $months = array(
+            'es' => array(
+                '01' => 'Enero',
+                '02' => 'Febrero',
+                '03' => 'Marzo',
+                '04' => 'Abril',
+                '05' => 'Mayo',
+                '06' => 'Junio',
+                '07' => 'Julio',
+                '08' => 'Agosto',
+                '09' => 'Septiembre',
+                '10' => 'Octubre',
+                '11' => 'Noviembre',
+                '12' => 'Diciembre'
+            ),
+            'en' => array(
+                '01' => 'January',
+                '02' => 'February',
+                '03' => 'March',
+                '04' => 'April',
+                '05' => 'May',
+                '06' => 'June',
+                '07' => 'July',
+                '08' => 'August',
+                '09' => 'September',
+                '10' => 'October',
+                '11' => 'November',
+                '12' => 'December'
+            ),
+            'pt' => array(
+                '01' => 'Janeiro',
+                '02' => 'Fevereiro',
+                '03' => 'Março',
+                '04' => 'Abril',
+                '05' => 'Maio',
+                '06' => 'Junho',
+                '07' => 'Julho',
+                '08' => 'Agosto',
+                '09' => 'Setembro',
+                '10' => 'Outubro',
+                '11' => 'Novembro',
+                '12' => 'Dezembro'
+            )
+        );
+
+        foreach ($posts as $post) {
+            $date = date('d-m-Y', strtotime($post->created_at));
+            $month = substr($date, 3, 2);
+            $year = substr($date, 6, 4);
+            $month_name = $months[$lang][$month] ?? $month; // Evita errores si $lang no está definido
+            $post->setAttribute('formatted_created_at', $month_name . ' de ' . $year); // No modificar 'created_at'
+        }
+
+        foreach ($posts as $post) {
+            foreach ($post->sections as $section) {
+                $section->setAttribute('title', str_replace('<p>', '', $section->title));
+                $section->setAttribute('title', str_replace('</p>', '', $section->title));
+                $section->setAttribute('content', str_replace('<p>', '', $section->content));
+                $section->setAttribute('content', str_replace('</p>', '', $section->content));
+                $section->setAttribute('content', str_replace('<ul>', '<ul class="text-justify ml-2" style="line-height: 2;">', $section->content));
+            }
+        }
+
+        foreach ($posts as $post) {
+            $sections = [];
+
+            // Agregar acá
+            $ordered = $post->sections->sortBy('order')->values()->all();
+
+            $n = count($ordered);
+            $half = intdiv($n, 2);
+
+            $left = array_slice($ordered, 0, $half);
+            $right = array_slice($ordered, $half);
+
+            for ($i = 0; $i < $half; $i++) {
+                $sections[] = $left[$i];
+                if (isset($right[$i])) {
+                    $sections[] = $right[$i];
+                }
+            }
+
+            if ($n % 2 !== 0) {
+                $sections[] = $right[$half];
+            }
+            
+            $post->setRelation('sections', $sections);
+
+        }
+
+        return view('news', compact('lang', 'title', 'description', 'template', 'title0', 'title1', 'title2', 'title3', 'title4', 'title5', 'posts'));
+    }
+
+    public function showPost($id) {
+        $post = Post::where('id', $id)
+            ->with('sections')
+            ->first();
+
+        if (!$post) {
+            return redirect()->route('error', ['lang' => $this->lang]);
+        }
+        
+        $lang = $this->lang ?? 'es';
+
+        $title = [
+            'es' => 'Posteo',
+            'en' => 'Post',
+            'pt' => 'Postagem'
+        ];
+
+        $title = $title[$lang];
+
+        $description = [
+            'es' => 'Detalle del posteo.',
+            'en' => 'Post details.',
+            'pt' => 'Detalhes do post.'
+        ];
+
+        $description = $description[$lang];
+
+        $template="default";
+
+        $title0 = array(
+            'es' => 'Inicio',
+            'en' => 'Home',
+            'pt' => 'Início',
+        );
+
+        $title1 = array(
+            'es' => 'Nosotros',
+            'en' => 'About us',
+            'pt' => 'Sobre nós',
+        );
+
+        $title2 = array(
+            'es' => 'Clientes',
+            'en' => 'Clients',
+            'pt' => 'Clientes',
+        );
+
+        $title3 = array(
+            'es' => 'Servicios',
+            'en' => 'Services',
+            'pt' => 'Serviços',
+        );
+
+        $title4 = array(
+            'es' => 'Contacto',
+            'en' => 'Contact',
+            'pt' => 'Contato',
+        );
+
+        $title5 = array(
+            'es' => 'Novedades',
+            'en' => 'News',
+            'pt' => 'Notícias',
+        );
+
+        $post->setAttribute('title', str_replace('<p>', '', $post->title));
+        $post->setAttribute('title', str_replace('</p>', '', $post->title));
+        $post->setAttribute('resume', str_replace('<p>', '', $post->resume));
+        $post->setAttribute('resume', str_replace('</p>', '', $post->resume));
+
+        foreach ($post->sections as $section) {
+            $section->setAttribute('title', str_replace('<p>', '', $section->title));
+            $section->setAttribute('title', str_replace('</p>', '', $section->title));
+            $section->setAttribute('content', str_replace('<p>', '', $section->content));
+            $section->setAttribute('content', str_replace('</p>', '', $section->content));
+            $section->setAttribute('content', str_replace('<ul>', '<ul class="text-white text-justify ml-2" style="line-height: 2;">', $section->content));
+        }
+
+        $sections = [];
+
+        // Agregar acá
+        $ordered = $post->sections->sortBy('order')->values()->all();
+
+        $n = count($ordered);
+        $half = intdiv($n, 2);
+
+        $left = array_slice($ordered, 0, $half);
+        $right = array_slice($ordered, $half);
+
+        for ($i = 0; $i < $half; $i++) {
+            $sections[] = $left[$i];
+            if (isset($right[$i])) {
+                $sections[] = $right[$i];
+            }
+        }
+
+        if ($n % 2 !== 0) {
+            $sections[] = $right[$half];
+        }
+        
+        $post->setRelation('sections', $sections);
+
+        // formated date
+        $date = date('d-m-Y', strtotime($post->created_at));
+        $month = substr($date, 3, 2);
+        $year = substr($date, 6, 4);
+
+        $months = array(
+            'es' => array(
+                '01' => 'Enero',
+                '02' => 'Febrero',
+                '03' => 'Marzo',
+                '04' => 'Abril',
+                '05' => 'Mayo',
+                '06' => 'Junio',
+                '07' => 'Julio',
+                '08' => 'Agosto',
+                '09' => 'Septiembre',
+                '10' => 'Octubre',
+                '11' => 'Noviembre',
+                '12' => 'Diciembre'
+            ),
+            'en' => array(
+                '01' => 'January',
+                '02' => 'February',
+                '03' => 'March',
+                '04' => 'April',
+                '05' => 'May',
+                '06' => 'June',
+                '07' => 'July',
+                '08' => 'August',
+                '09' => 'September',
+                '10' => 'October',
+                '11' => 'November',
+                '12' => 'December'
+            ),
+            'pt' => array(
+                '01' => 'Janeiro',
+                '02' => 'Fevereiro',
+                '03' => 'Março',
+                '04' => 'Abril',
+                '05' => 'Maio',
+                '06' => 'Junho',
+                '07' => 'Julho',
+                '08' => 'Agosto',
+                '09' => 'Setembro',
+                '10' => 'Outubro',
+                '11' => 'Novembro',
+                '12' => 'Dezembro'
+            )
+        );
+
+        $month_name = $months[$lang][$month] ?? $month; // Evita errores si $lang no está definido
+        $post->setAttribute('formatted_created_at', $month_name . ' de ' . $year); // No modificar 'created_at'
+        
+        return view('post', compact('lang', 'title', 'description', 'template', 'title0', 'title1', 'title2', 'title3', 'title4', 'title5', 'post'));
     }
 
     public function error() {

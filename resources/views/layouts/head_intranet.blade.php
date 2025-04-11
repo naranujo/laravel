@@ -24,4 +24,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Hepta+Slab:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
+    <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
 </head>

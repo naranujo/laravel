@@ -14,8 +14,7 @@ return new class extends Migration
         Schema::create('posts', function (Blueprint $table) {
             $table->uuid('id')->primary(); // ID
             $table->string('title', 255); // Título del post
-            $table->text('resume'); // Resumen del post
-            $table->string('image', 255); // Imagen del post
+            $table->string('resume', 255); // Resumen del post
             $table->string('category_name', 255); // Nombre de la categoría
             $table->string('author', 255); // Autor del post (email)
             $table->enum('status', ['draft', 'published', 'archived']); // Estado del post

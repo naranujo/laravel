@@ -2,6 +2,10 @@
 
 @extends('layouts.intranet')
 
+@section('title')
+    <h1 class="pt-5">{{ $title }}</h1>
+@endsection
+
 @section('content')
     <form method="POST" action="{{ route('submit.reset_password_token', ['token' => $token]) }}" class="form w-50 mt-5">
         @csrf

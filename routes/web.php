@@ -12,18 +12,19 @@ use App\Http\Controllers\UserController;
 // HOME
 
 // Landing page
-Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('/', [HomeController::class, 'index'])->name('home'); // check
 // Subscription
 Route::post('/subscribe', [HomeController::class, 'storeSubscription'])->name('submit.subscribe');
 // Newsletter
 Route::get('/news', [HomeController::class, 'news'])->name('news');
+Route::get('/news/post/{id}', [HomeController::class, 'showPost'])->name('news.post');
 // Error page
 Route::get('/error', [HomeController::class, 'error'])->name('error');
 
 // INTRANET
 
 // Intranet home page
-Route::get('/intranet', [PostController::class, 'intranet'])->name('view.intranet');
+Route::get('/intranet', [PostController::class, 'intranet'])->name('view.intranet'); // check
 
 // AUTHENTICATION
 
@@ -31,10 +32,10 @@ Route::get('/intranet', [PostController::class, 'intranet'])->name('view.intrane
 Route::get('/intranet/register', [AuthController::class, 'showRegister'])->name('view.register');
 Route::post('/intranet/register', [AuthController::class, 'processRegister'])->name('submit.register');
 // Login
-Route::get('/intranet/login', [AuthController::class, 'showLogin'])->name('view.login');
-Route::post('/intranet/login', [AuthController::class, 'processLogin'])->name('submit.login');
+Route::get('/intranet/login', [AuthController::class, 'showLogin'])->name('view.login'); // check
+Route::post('/intranet/login', [AuthController::class, 'processLogin'])->name('submit.login'); // check
 // Logout
-Route::post('/intranet/logout', [AuthController::class, 'logout'])->name('submit.logout');
+Route::post('/intranet/logout', [AuthController::class, 'logout'])->name('submit.logout'); // check
 // reset password
 Route::get('/intranet/password/reset', [AuthController::class, 'showResetPassword'])->name('view.reset_password');
 Route::post('/intranet/password/reset', [AuthController::class, 'precessResetPassword'])->name('submit.reset_password');
@@ -63,15 +64,22 @@ Route::post('/intranet/profile/edit', [ProfileController::class, 'updateProfile'
 
 // POSTS
 Route::get('/intranet/posts', [PostController::class, 'showPosts'])->name('view.posts');
-Route::get('/intranet/post/{id}', [PostController::class, 'showPost'])->name('view.post');
-Route::get('/intranet/add_post', [PostController::class, 'showCreatePost'])->name('view.add_post');
-Route::post('/intranet/add_post', [PostController::class, 'storePost'])->name('submit.add_post');
+Route::get('/intranet/post/{id}', [PostController::class, 'showPost'])->name('view.post'); // check
+Route::post('/intranet/post/{id}', [PostController::class, 'changeStatus'])->name('submit.change_status'); // check
+Route::get('/intranet/add_post', [PostController::class, 'showCreatePost'])->name('view.add_post'); // check
+Route::post('/intranet/add_post', [PostController::class, 'storePost'])->name('submit.store_post'); // check
 Route::get('/intranet/edit_post/{id}', [PostController::class, 'showEditPost'])->name('view.edit_post');
 Route::post('/intranet/edit_post/{id}', [PostController::class, 'updatePost'])->name('submit.edit_post');
 Route::delete('/intranet/delete_post/{id}', [PostController::class, 'destroyPost'])->name('submit.delete_post');
+Route::get('/intranet/download_post/{id}', [PostController::class, 'downloadPost'])->name('download.post');
 
 // TEST ENDPOINTS
 
 // Test 1 - Send email
 Route::get('/correo', [TestMailController::class, 'mostrarFormulario'])->name('formulario.correo');
 Route::post('/enviar-correo', [TestMailController::class, 'enviarCorreo'])->name('enviar.correo');
+Route::get('/run-migrations', function () {
+    Artisan::call('migrate --force');
+    return 'Migraciones ejecutadas correctamente.';
+})->name('run.migrations');
+

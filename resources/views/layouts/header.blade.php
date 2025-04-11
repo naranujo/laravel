@@ -12,32 +12,32 @@
             <div class="collapse navbar-collapse bg-primary" id="navbarSupportedContent">
                 <ul class="navbar-nav ml-auto align-items-center bg-primary">
                     <li class="nav-item">
-                        <a class="nav-link js-scroll-trigger" href="#top">
+                        <a class="nav-link js-scroll-trigger" href="/#top?lang={{ $lang }}">
                             {{ $title0[$lang] }}<span class="sr-only">Menu</span>
                         </a>
                     </li>
                     <li class="nav-item pl-lg-2 pl-xl-4">
-                        <a class="nav-link js-scroll-trigger" href="#nosotros">
+                        <a class="nav-link js-scroll-trigger" href="/#nosotros?lang={{ $lang }}">
                             {{ $title1[$lang] }}
                         </a>
                     </li>
                     <li class="nav-item pl-lg-2 pl-xl-4">
-                        <a class="nav-link js-scroll-trigger" href="#clientes">
+                        <a class="nav-link js-scroll-trigger" href="/#clientes?lang={{ $lang }}">
                             {{ $title2[$lang] }}
                         </a>
                     </li>
                     <li class="nav-item pl-lg-2 pl-xl-4">
-                        <a class="nav-link js-scroll-trigger" href="#servicios">
+                        <a class="nav-link js-scroll-trigger" href="/#servicios?lang={{ $lang }}">
                             {{ $title3[$lang] }}
                         </a>
                     </li>
                     <li class="nav-item  pl-lg-2 pl-xl-4">
-                        <a class="nav-link js-scroll-trigger" href="#contacto">
+                        <a class="nav-link js-scroll-trigger" href="/#contacto?lang={{ $lang }}">
                             {{ $title4[$lang] }}
                         </a>
                     </li>
                     <li class="nav-item  pl-lg-2 pl-xl-4">
-                        <a class="nav-link js-scroll-trigger" href="./news">
+                        <a class="nav-link js-scroll-trigger" href="./news?lang={{ $lang }}">
                             {{ $title5[$lang] }}
                         </a>
                     </li>

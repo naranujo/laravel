@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('title', 255); // Título de la sección
             $table->text('content'); // Contenido de la sección
             $table->integer('order'); // Orden de la sección en el post
-            $table->uuid('post_id'); // ID del post al que pertenece la sección
+            $table->string('post_id'); // ID del post al que pertenece la sección
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->useCurrent();
 

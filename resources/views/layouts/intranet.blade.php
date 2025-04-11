@@ -7,7 +7,7 @@
 @include('layouts.header_intranet')
 
 <main class="container">
-    <h1 class="pt-5">{{ $title }}</h1>
+    @yield('title')
     @yield('content')
 </main>
 
