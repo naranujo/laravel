@@ -1,20 +1,29 @@
 <!-- resources/views/layouts/app.blade.php -->
+<!DOCTYPE html>
+<html lang="{{ $lang ?? 'es' }}">
 
-@include('layouts.head')
+    @include('layouts.head')
 
-<body>
+    <body class="d-flex flex-column min-vh-100">
+        @yield('styles')
 
-@include('layouts.header')
+        @include('layouts.header')
 
-<section id="slider" class="carousel slide carousel-fade bg-primary pt-2 text-white" data-interval="6000" data-pause="false" data-ride="carousel">
-    @yield('slider')
-</section>
+        <main class="flex-fill">
+            @hasSection('slider')
+                @yield('slider')
+            @else
+                <div class="mt-5 mb-4">
+                    <p>.</p>
+                </div>
+            @endif
+            @yield('title')
+            @yield('content')
+            @yield('scripts')
+        </main>
 
-<main class="container" id="main">
-    @yield('content')
-</main>
+        @include('layouts.footer')
 
-@include('layouts.footer')
+    </body>
 
-</body>
 </html>

@@ -566,11 +566,6 @@ class HomeController extends Controller
             'pt' => 'Notícias',
         );
 
-        $posts = Post::where('status', 'draft')
-            ->with('sections')
-            ->orderBy('created_at', 'desc')
-            ->get();
-
         $months = array(
             'es' => array(
                 '01' => 'Enero',
@@ -616,52 +611,82 @@ class HomeController extends Controller
             )
         );
 
+        $sinNovedades = [
+            'es' => 'No hay novedades',
+            'en' => 'No news'
+        ];
+    
+        $novedades = [
+            'es' => 'Novedades',
+            'en' => 'News'
+        ];
+    
+        $leerMas = [
+            'es' => 'Leer más',
+            'en' => 'Read more'
+        ];
+    
+        $page = 1;
+        
+        // Los 3 más nuevos
+        $carrouselPosts = Post::where('status', 'published')
+            ->orderBy('created_at', 'desc')
+            ->take(3)
+            ->get();
+            
+        // El resto (sin incluir los 3 más nuevos)
+        $remainingCount = Post::count() - 3;
+        $posts = Post::where('status', 'published')
+            ->orderBy('created_at', 'desc')
+            ->skip(3)
+            ->take($remainingCount > 0 ? $remainingCount : 0)
+            ->get();
+
         foreach ($posts as $post) {
+            $post->setAttribute('title', strip_tags($post->title));
+
+            // formatted_created_at
             $date = date('d-m-Y', strtotime($post->created_at));
             $month = substr($date, 3, 2);
             $year = substr($date, 6, 4);
             $month_name = $months[$lang][$month] ?? $month; // Evita errores si $lang no está definido
-            $post->setAttribute('formatted_created_at', $month_name . ' de ' . $year); // No modificar 'created_at'
+            $post->setAttribute('formatted_created_at', $month_name . ' de ' . $year); // No modificar 'created_at));'
         }
+        foreach ($carrouselPosts as $post) {
+            $post->setAttribute('title', strip_tags($post->title));
+            $post->setAttribute('resume', ucfirst(mb_strimwidth(strip_tags($post->resume), 0, 150, '...')));
 
-        foreach ($posts as $post) {
-            foreach ($post->sections as $section) {
-                $section->setAttribute('title', str_replace('<p>', '', $section->title));
-                $section->setAttribute('title', str_replace('</p>', '', $section->title));
-                $section->setAttribute('content', str_replace('<p>', '', $section->content));
-                $section->setAttribute('content', str_replace('</p>', '', $section->content));
-                $section->setAttribute('content', str_replace('<ul>', '<ul class="text-justify ml-2" style="line-height: 2;">', $section->content));
-            }
+            // formatted_created_at
+            $date = date('d-m-Y', strtotime($post->created_at));
+            $month = substr($date, 3, 2);
+            $year = substr($date, 6, 4);
+            $month_name = $months[$lang][$month] ?? $month; // Evita errores si $lang no está definido
+            $post->setAttribute('formatted_created_at', $month_name . ' de ' . $year); // No modificar 'created_at));'
         }
+        
+        $hasMorePosts = Post::count() > 5;
 
-        foreach ($posts as $post) {
-            $sections = [];
+        $page = 1;
 
-            // Agregar acá
-            $ordered = $post->sections->sortBy('order')->values()->all();
-
-            $n = count($ordered);
-            $half = intdiv($n, 2);
-
-            $left = array_slice($ordered, 0, $half);
-            $right = array_slice($ordered, $half);
-
-            for ($i = 0; $i < $half; $i++) {
-                $sections[] = $left[$i];
-                if (isset($right[$i])) {
-                    $sections[] = $right[$i];
-                }
-            }
-
-            if ($n % 2 !== 0) {
-                $sections[] = $right[$half];
-            }
-            
-            $post->setRelation('sections', $sections);
-
-        }
-
-        return view('news', compact('lang', 'title', 'description', 'template', 'title0', 'title1', 'title2', 'title3', 'title4', 'title5', 'posts'));
+        return view('news', compact(
+            'lang',
+            'title',
+            'description',
+            'template',
+            'title0',
+            'title1',
+            'title2',
+            'title3',
+            'title4',
+            'title5',
+            'posts',
+            'carrouselPosts',
+            'sinNovedades',
+            'novedades',
+            'leerMas',
+            'hasMorePosts',
+            'page',
+        ));
     }
 
     public function showPost($id) {
@@ -823,6 +848,82 @@ class HomeController extends Controller
     }
 
     public function error() {
-        return view('error');
+        $lang = $_GET['lang'] ?? 'es';
+
+        $title = [
+            'es' => 'Error',
+            'en' => 'Error',
+            'pt' => 'Erro'
+        ];
+
+        $description = [
+            'es' => 'Error en la página.',
+            'en' => 'Error on the page.',
+            'pt' => 'Erro na página.'
+        ];
+
+        $template="default";
+
+        $title0 = array(
+            'es' => 'Inicio',
+            'en' => 'Home',
+            'pt' => 'Início',
+        );
+        $title1 = array(
+            'es' => 'Nosotros',
+            'en' => 'About us',
+            'pt' => 'Sobre nós',
+        );
+        $title2 = array(
+            'es' => 'Clientes',
+            'en' => 'Clients',
+            'pt' => 'Clientes',
+        );
+        $title3 = array(
+            'es' => 'Servicios',
+            'en' => 'Services',
+            'pt' => 'Serviços',
+        );
+        $title4 = array(
+            'es' => 'Contacto',
+            'en' => 'Contact',
+            'pt' => 'Contato',
+        );
+        $title5 = array(
+            'es' => 'Novedades',
+            'en' => 'News',
+            'pt' => 'Notícias',
+        );
+
+        // Quiero crear un objeto de error con code, message and description
+        $error = new \stdClass();
+        
+        $error->code = 404;
+        
+        $error->message = [
+            'es' => 'Página no encontrada',
+            'en' => 'Page not found',
+            'pt' => 'Página não encontrada'
+        ];
+        
+        $error->description = [
+            'es' => 'La página que buscas no existe. Por favor verifica la URL o vuelve a la página de inicio.',
+            'en' => 'The page you are looking for does not exist. Please check the URL or return to the home page.',
+            'pt' => 'A página que você está procurando não existe. Verifique a URL ou volte para a página inicial.'
+        ];
+
+        return view('error', [
+            'lang' => $lang,
+            'title' => $title[$lang],
+            'description' => $description[$lang],
+            'template' => $template,
+            'title0' => $title0[$lang],
+            'title1' => $title1[$lang],
+            'title2' => $title2[$lang],
+            'title3' => $title3[$lang],
+            'title4' => $title4[$lang],
+            'title5' => $title5[$lang],
+            'error' => $error
+        ]);
     }
 }

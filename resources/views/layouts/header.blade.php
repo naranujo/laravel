@@ -37,7 +37,7 @@
                         </a>
                     </li>
                     <li class="nav-item  pl-lg-2 pl-xl-4">
-                        <a class="nav-link js-scroll-trigger" href="./news?lang={{ $lang }}">
+                        <a class="nav-link js-scroll-trigger" href="/news?lang={{ $lang }}">
                             {{ $title5[$lang] }}
                         </a>
                     </li>

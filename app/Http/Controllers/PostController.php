@@ -82,45 +82,20 @@ class PostController extends Controller {
             'es' => 'No hay novedades',
             'en' => 'No news'
         ];
-    
-        $novedades = [
-            'es' => 'Novedades',
-            'en' => 'News'
-        ];
-    
-        $leerMas = [
-            'es' => 'Leer más',
-            'en' => 'Read more'
-        ];
-    
-        $page = 1;
-        
-        // Los 3 más nuevos
-        $carrouselPosts = Post::orderBy('created_at', 'desc')
-            ->take(3)
-            ->get();
-            
-        // El resto (sin incluir los 3 más nuevos)
-        $remainingCount = Post::count() - 3;
+
         $posts = Post::orderBy('created_at', 'desc')
-            ->skip(3)
-            ->take($remainingCount > 0 ? $remainingCount : 0)
             ->get();
 
         foreach ($posts as $post) {
-            $post->setAttribute('title', str_replace('<p>', '', $post->title));
-            $post->setAttribute('title', str_replace('</p>', '', $post->title));
-            $post->setAttribute('resume', str_replace('<p>', '', $post->resume));
-            $post->setAttribute('resume', str_replace('</p>', '', $post->resume));
+            $post->setAttribute('title', ucfirst(strip_tags($post->title)));
+
+            // format date DD/MM/AAAA
+            $date = date('d/m/Y', strtotime($post->created_at));
+            $post->setAttribute('formatted_created_at', $date); // No modificar 'created_at'
+
+            // capitalize status
+            $post->setAttribute('status', ucfirst($post->status));
         }
-        foreach ($carrouselPosts as $post) {
-            $post->setAttribute('title', str_replace('<p>', '', $post->title));
-            $post->setAttribute('title', str_replace('</p>', '', $post->title));
-            $post->setAttribute('resume', str_replace('<p>', '', $post->resume));
-            $post->setAttribute('resume', str_replace('</p>', '', $post->resume));
-        }
-        
-        $hasMorePosts = Post::count() > 5;
 
         return view('intranet.home', [
             'lang' => $this->lang ?? 'es',
@@ -135,13 +110,7 @@ class PostController extends Controller {
             'profileLabel' => $this->profileLabel[$this->lang],
             'logoutLabel' => $this->logoutLabel[$this->lang],
             'usersAdminLabel' => $this->usersAdminLabel[$this->lang],
-            'carrouselPosts' => $carrouselPosts,
             'posts' => $posts,
-            'sinNovedades' => $sinNovedades,
-            'novedades' => $novedades,
-            'leerMas' => $leerMas,
-            'page' => $page,
-            'hasMorePosts' => $hasMorePosts,
         ]);
     }
 
@@ -267,18 +236,17 @@ class PostController extends Controller {
     
             DB::commit();
 
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Post creado exitosamente'
-            ]);
+            // Redirect a la vista de posteo /intranet/post/{id}
+            return redirect()->route('view.post', ['lang' => $this->lang, 'id' => $uuid]);
     
         } catch (\Exception $e) {
             DB::rollBack();
-    
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Error al crear el post: ' . $e->getMessage()
-            ]);
+            
+            // Mostrar mensaje de error
+            // Recargar la vista con el mensaje de error sin borrar el formulario
+            return redirect()->back()
+                ->withInput()
+                ->withErrors(['error' => 'Error al guardar el post: ' . $e->getMessage()]);
         }
     }
 
@@ -405,17 +373,16 @@ class PostController extends Controller {
 
         $post = Post::find($id);
         if (!$post) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Post no encontrado'
-            ]);
+            return redirect()->route('error', ['lang' => $this->lang]);
         }
-        $post->status = $status;
-        $post->save();
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Estado del post actualizado'
-        ]);
+
+        try {
+            $post->status = $status;
+            $post->save();
+            return redirect()->route('view.post', ['lang' => $this->lang, 'id' => $post->id]);
+        } catch (\Exception $e) {
+            return redirect()->route('error', ['lang' => $this->lang]);
+        }
     }
 
     public function showEditPost($id) {}
@@ -429,10 +396,8 @@ class PostController extends Controller {
             ->first();
         
         if (!$post) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Post no encontrado'
-            ]);
+            // redirect to error page
+            return redirect()->route('error', ['lang' => $this->lang]);
         };
 
         $lang = $this->lang ?? 'es';
