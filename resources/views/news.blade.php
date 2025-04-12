@@ -58,7 +58,7 @@
                 @else
                     @foreach ($posts as $post)
                         @if ($index % 2 != 0)
-                            <article class="col pl-0 text-primary mb-2">
+                            <article class="col pr-0 text-primary mb-2">
                                 <hr class="mw-75 mx-auto" style="border: 5px solid #a99c6b;">
                                 <p class="text-primary mx-auto">{{ $novedades[$lang] }}</p>
                                 <h6 class="text-primary text-justify">{{ $post->title }}</h6>
@@ -68,7 +68,7 @@
                                 </div>
                             </article>
                         @else
-                            <article class="col pr-0 text-primary mb-2">
+                            <article class="col pl-0 text-primary mb-2">
                                 <hr class="mw-75 mx-auto" style="border: 5px solid #a99c6b;">
                                 <p class="text-primary mx-auto">{{ $novedades[$lang] }}</p>
                                 <h6 class="text-primary text-justify">{{ $post->title }}</h6>
