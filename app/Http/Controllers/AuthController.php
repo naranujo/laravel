@@ -7,8 +7,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use App\Models\User;
 use App\Models\PasswordReset;
-use Illuminate\Support\Facades\Mail;
-use App\Mail\MiCorreo;
+
+use App\Http\Controllers\MailController;
 
 class AuthController extends Controller {
     public function __construct() {
@@ -264,7 +264,7 @@ class AuthController extends Controller {
         return redirect()->route('view.login');
     }
 
-    public function showResetPassword() {
+    public function showForgotPassword() {
         // head
         $this->title = [
             'es' => 'Olvidé mi Contraseña',
@@ -317,7 +317,7 @@ class AuthController extends Controller {
         ]);
     }
 
-    public function precessResetPassword(Request $request) {
+    public function processForgotPassword(Request $request) {
         $subject = [
             'es' => 'Recuperar contraseña',
             'en' => 'Recover password',
@@ -345,23 +345,88 @@ class AuthController extends Controller {
             // Send email with link to reset password
             PasswordReset::where('email', $email)->delete();
 
-            $token = bin2hex(random_bytes(32));
-            $passwordReset = new PasswordReset;
-            $passwordReset->email = $email;
-            $passwordReset->token = $token;
-            $passwordReset->save();
-
-            $url = 'http://localhost:8000/intranet/password/reset/' . $token;
+            $token = bin2hex(random_bytes(16));
+            $subject = "Recuperación de Contraseña";
+            $headers = "MIME-Version: 1.0" . "\r\n";
+            $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
+            $headers .= "From: Greenock Trust <webmaster@greenocktrust.com>" . "\r\n";
+            $message = '
+                <!DOCTYPE html>
+                <html>
+                    <head>
+                        <meta charset="UTF-8">
+                        <title>Recuperación de Contraseña</title>
+                        <style>
+                            body { font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 0; }
+                            .container { max-width: 600px; margin: 20px auto; background: #ffffff; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); }
+                            .header { text-align: center; padding-bottom: 20px; }
+                            .button { display: inline-block; padding: 10px 20px; margin: 20px 0; font-size: 16px; color: #ffffff; background-color: #007bff; text-decoration: none; border-radius: 5px; }
+                            .footer { font-size: 12px; color: #666; text-align: center; margin-top: 20px; }
+                        </style>
+                    </head>
+                    <body>
+                        <div class="container">
+                            <div class="header">
+                                <h2>Recuperación de Contraseña</h2>
+                            </div>
+                            <p>Hola, ' . $user->first_name . ' ' . $user->last_name . '</p>
+                            <p>Recibimos una solicitud para restablecer tu contraseña. Haz clic en el botón de abajo para continuar:</p>
+                            <p style="text-align: center;">
+                                <a href="' . url('https://greenocktrust.com/intranet/password/reset?token=' . $token . '&email=' . $email) . '" class="button">Restablecer Contraseña</a>
+                            </p>
+                            <p>Si no solicitaste este cambio, puedes ignorar este mensaje.</p>
+                            <p><strong>Nota:</strong> Este código es válido solo por 30 minutos. Después de ese tiempo, necesitarás solicitar un nuevo código.</p>
+                            <p>Saludos,<br>El equipo de Greenock Trust</p>
+                            <div class="footer">
+                                <p>Este es un mensaje automático, por favor no respondas.</p>
+                            </div>
+                        </div>
+                    </body>
+                </html>
+            ';
             
-            // enviar mail
-            Mail::to($email)->send(new MiCorreo('Recuperar contraseña', $url));
+            DB::beginTransaction();
+
+            try {
+                $passwordReset = new PasswordReset();
+                $passwordReset->email = $email;
+                $passwordReset->token = $token;
+                $passwordReset->save();
+
+                // Send email
+                mail($email, $subject, $message, $headers);
+
+                // Commit transaction
+                DB::commit();
+
+                return redirect()->back()->with('success', $successMessage[$this->lang]);
+
+            } catch (\Exception $e) {
+                DB::rollBack();
+                // Handle error
+                return redirect()->back()->with('error', 'Error al enviar el correo electrónico. Intenta nuevamente más tarde.');
+            }
+        } else {
+            return redirect()->back()->with('error', $successMessage[$this->lang]);
         }
 
-        return redirect()->back()->with('success', $successMessage[$this->lang]);
     }
 
-    // recieve token by parameter
-    public function showResetPasswordToken($token) {
+    public function showResetPassword() {
+
+        // get token and email from url
+        $token = $_GET['token'] ?? null;
+        $email = $_GET['email'] ?? null;
+
+        if (!$token || !$email) {
+            return redirect()->route('view.error', ['lang' => 'es', 'status_code' => 400]);
+        }
+
+        // si la sesión está activa, redirigir a la página de inicio
+        if ($this->loggedIn) {
+            return redirect()->route('view.intranet');
+        }
+
         // head
         $this->title = [
             'es' => 'Restablecer Contraseña',
@@ -383,6 +448,12 @@ class AuthController extends Controller {
         ];
 
         // form
+        $this->emailLabel = [
+            'es' => 'Correo Electrónico',
+            'en' => 'Email',
+            'pt' => 'E-mail'
+        ];
+
         $this->passwordLabel = [
             'es' => 'Contraseña',
             'en' => 'Password',
@@ -408,44 +479,47 @@ class AuthController extends Controller {
             'loggedIn' => $this->loggedIn,
             'role' => $this->role,
             'back' => $this->back[$this->lang],
+            'emailLabel' => $this->emailLabel[$this->lang],
             'passwordLabel' => $this->passwordLabel[$this->lang],
             'confirmPasswordLabel' => $this->confirmPasswordLabel[$this->lang],
-            'token' => $token
+            'token' => $token,
+            'email' => $email
         ]);
-
     }
 
-    public function processsResetPasswordToken(Request $request, $token) {
+    public function processResetPassword(Request $request, $token) {
         // Validate
         $validated = $request->validate([
+            'email' => 'required|email',
             'password' => 'required',
             'confirm_password' => 'required'
         ]);
 
         // Sanitize
+        $email = filter_var($request->input('email'), FILTER_SANITIZE_EMAIL);
         $password = filter_var($request->input('password'), FILTER_SANITIZE_STRING);
         $confirm_password = filter_var($request->input('confirm_password'), FILTER_SANITIZE_STRING);
 
-        // Check if passwords match
-        if ($password != $confirm_password) {
-            return redirect()->back()->with('error', 'Passwords do not match');
-        }
-
         // Check if token exists
-        $passwordReset = PasswordReset::where('token', $token)->first();
+        $passwordReset = PasswordReset::where('email', $email)->where('token', $token)->first();
 
         if ($passwordReset) {
-            // Check if email exists
-            $user = User::where('email', $passwordReset->email)->first();
-
-            if ($user) {
+            // Check if password and confirm password match
+            if ($password === $confirm_password) {
+                // Update user password
+                $user = User::where('email', $email)->first();
                 $user->password = password_hash($password, PASSWORD_DEFAULT);
                 $user->save();
 
-                return redirect()->route('home')->with('success', 'Password reset');
-            }
-        }
+                // Delete token
+                $passwordReset->delete();
 
-        return redirect()->back()->with('error', 'Token not found');
+                return redirect()->route('view.login')->with('success', 'Contraseña restablecida con éxito.');
+            } else {
+                return redirect()->back()->with('error', 'Las contraseñas no coinciden.');
+            }
+        } else {
+            return redirect()->back()->with('error', 'Token inválido o expirado.');
+        }
     }
 }

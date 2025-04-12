@@ -15,6 +15,7 @@ return new class extends Migration
             $table->string('email', 255)->primary(); // Email del usuario
             $table->string('token', 255); // Token de recuperación
             $table->timestamp('created_at')->useCurrent(); // Fecha de creación
+            $table->timestamp('updated_at')->useCurrent()->useCurrentOnUpdate(); // Fecha de actualización
         });
     }
 

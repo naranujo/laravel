@@ -695,7 +695,7 @@ class HomeController extends Controller
             ->first();
 
         if (!$post) {
-            return redirect()->route('error', ['lang' => $this->lang]);
+            return redirect()->route('view.error', ['lang' => $this->lang]);
         }
         
         $lang = $this->lang ?? 'es';
@@ -847,7 +847,8 @@ class HomeController extends Controller
         return view('post', compact('lang', 'title', 'description', 'template', 'title0', 'title1', 'title2', 'title3', 'title4', 'title5', 'post'));
     }
 
-    public function error() {
+    // /error/{status_code}
+    public function error($code) {
         $lang = $_GET['lang'] ?? 'es';
 
         $title = [
@@ -895,35 +896,139 @@ class HomeController extends Controller
             'pt' => 'Notícias',
         );
 
+        $status = [
+            'es' => [
+                '400' => [
+                    'title' => 'Solicitud incorrecta',
+                    'description' => 'La solicitud realizada no es válida. Por favor verifica los datos ingresados.'
+                ],
+                '401' => [
+                    'title' => 'No autorizado',
+                    'description' => 'No tienes permiso para acceder a esta página.'
+                ],
+                '403' => [
+                    'title' => 'Acceso denegado',
+                    'description' => 'No tienes permiso para acceder a esta página.'
+                ],
+                '404' => [
+                    'title' => 'Página o recurso no encontrado',
+                    'description' => 'La página o el recurso que buscas no existe. Por favor verifica la URL o vuelve a la página de inicio.'
+                ],
+                '409' => [
+                    'title' => 'Conflicto',
+                    'description' => 'La solicitud no pudo completarse debido a un conflicto con el estado actual del recurso.'
+                ],
+                '422' => [
+                    'title' => 'Entidad no procesable',
+                    'description' => 'No se pudo procesar la solicitud debido a errores de validación.'
+                ],
+                '500' => [
+                    'title' => 'Error interno del servidor',
+                    'description' => 'Ha ocurrido un error interno en el servidor. Por favor intenta nuevamente más tarde.'
+                ],
+                '503' => [
+                    'title' => 'Servicio no disponible',
+                    'description' => 'El servicio no está disponible en este momento. Por favor intenta nuevamente más tarde.'
+                ]
+            ],
+            'en' => [
+                '400' => [
+                    'title' => 'Bad Request',
+                    'description' => 'The request is not valid. Please check the data entered.'
+                ],
+                '401' => [
+                    'title' => 'Unauthorized',
+                    'description' => 'You are not authorized to access this page.'
+                ],
+                '403' => [
+                    'title' => 'Forbidden',
+                    'description' => 'You do not have permission to access this page.'
+                ],
+                '404' => [
+                    'title' => 'Page or Resource Not Found',
+                    'description' => 'The page or resource you are looking for does not exist. Please check the URL or return to the homepage.'
+                ],
+                '409' => [
+                    'title' => 'Conflict',
+                    'description' => 'The request could not be completed due to a conflict with the current state of the resource.'
+                ],
+                '422' => [
+                    'title' => 'Unprocessable Entity',
+                    'description' => 'The request could not be processed due to validation errors.'
+                ],
+                '500' => [
+                    'title' => 'Internal Server Error',
+                    'description' => 'An internal server error occurred. Please try again later.'
+                ],
+                '503' => [
+                    'title' => 'Service Unavailable',
+                    'description' => 'The service is currently unavailable. Please try again later.'
+                ]
+            ],
+            'pt' => [
+                '400' => [
+                    'title' => 'Requisição inválida',
+                    'description' => 'A requisição enviada é inválida. Verifique os dados informados.'
+                ],
+                '401' => [
+                    'title' => 'Não autorizado',
+                    'description' => 'Você não tem autorização para acessar esta página.'
+                ],
+                '403' => [
+                    'title' => 'Acesso negado',
+                    'description' => 'Você não tem permissão para acessar esta página.'
+                ],
+                '404' => [
+                    'title' => 'Página ou recurso não encontrado',
+                    'description' => 'A página ou o recurso que você procura não existe. Verifique a URL ou volte à página inicial.'
+                ],
+                '409' => [
+                    'title' => 'Conflito',
+                    'description' => 'A requisição não pôde ser concluída devido a um conflito com o estado atual do recurso.'
+                ],
+                '422' => [
+                    'title' => 'Entidade não processável',
+                    'description' => 'A requisição não pôde ser processada devido a erros de validação.'
+                ],
+                '500' => [
+                    'title' => 'Erro interno do servidor',
+                    'description' => 'Ocorreu um erro interno no servidor. Por favor, tente novamente mais tarde.'
+                ],
+                '503' => [
+                    'title' => 'Serviço indisponível',
+                    'description' => 'O serviço está indisponível no momento. Por favor, tente novamente mais tarde.'
+                ]
+            ]
+        ];
+
+        // Si no se encuentra el código de error, se redirige a 404
+        if (!isset($status[$lang][$code])) {
+            $code = '404';
+        }
+        
+
         // Quiero crear un objeto de error con code, message and description
         $error = new \stdClass();
         
-        $error->code = 404;
-        
-        $error->message = [
-            'es' => 'Página no encontrada',
-            'en' => 'Page not found',
-            'pt' => 'Página não encontrada'
-        ];
-        
-        $error->description = [
-            'es' => 'La página que buscas no existe. Por favor verifica la URL o vuelve a la página de inicio.',
-            'en' => 'The page you are looking for does not exist. Please check the URL or return to the home page.',
-            'pt' => 'A página que você está procurando não existe. Verifique a URL ou volte para a página inicial.'
-        ];
+        $error->code = $code;
+        $error->message = $status[$lang][$code]['title'];
+        $error->description = $status[$lang][$code]['description'];
+
+        $title = "Error " . $error->code;
+        $description = $error->description;
 
         return view('error', [
             'lang' => $lang,
-            'title' => $title[$lang],
-            'description' => $description[$lang],
             'template' => $template,
-            'title0' => $title0[$lang],
-            'title1' => $title1[$lang],
-            'title2' => $title2[$lang],
-            'title3' => $title3[$lang],
-            'title4' => $title4[$lang],
-            'title5' => $title5[$lang],
-            'error' => $error
+            'title0' => $title0,
+            'title1' => $title1,
+            'title2' => $title2,
+            'title3' => $title3,
+            'title4' => $title4,
+            'title5' => $title5,
+            'error' => $error,
+            'title' => $title,
+            'description' => $description,
         ]);
     }
 }

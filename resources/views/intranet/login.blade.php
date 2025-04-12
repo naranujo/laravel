@@ -21,7 +21,7 @@
                     <i class="bi bi-eye-slash-fill text-primary"></i>
                 </div>
             </div>
-            <a href="{{ route('view.reset_password', ['lang' => $lang]) }}" class="text-secondary">{{ $forgotPasswordLabel }}</a>
+            <a href="{{ route('view.forgot_password', ['lang' => $lang]) }}" class="text-secondary">{{ $forgotPasswordLabel }}</a>
         </div>
         <button type="submit" class="btn btn-primary bg-primary border-0 mt-2 mb-4">{{ $title }}</button>
         <p>{{ $registerLabel0 }}<a href="{{ route('view.register', ['lang' => $lang]) }}" class="text-secondary" style="text-decoration:underline;">{{ $registerLabel1 }}</a></p>

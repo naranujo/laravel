@@ -3,7 +3,7 @@
 @extends('layouts.intranet')
 
 @section('content')
-    <form method="POST" action="{{ route('submit.reset_password') }}" class="form w-50 mt-5">
+    <form method="POST" action="{{ route('submit.forgot_password') }}" class="form w-50 mt-5">
         @csrf
         <div class="mb-3">
             <label for="email" class="form-label">{{ $emailLabel }}</label>

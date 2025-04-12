@@ -9,6 +9,11 @@ use App\Http\Controllers\PostController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
 
+// SI USAN UNA RUTA NO DEFINIDA ACÁ EN EL CONTROLADOR, SE REDIRIGE A LA PÁGINA DE ERROR 404
+Route::fallback(function () {
+    return redirect()->route('view.error', ['status_code' => 404]);
+});
+
 // HOME
 
 // Landing page
@@ -16,10 +21,10 @@ Route::get('/', [HomeController::class, 'index'])->name('home'); // check
 // Subscription
 Route::post('/subscribe', [HomeController::class, 'storeSubscription'])->name('submit.subscribe');
 // Newsletter
-Route::get('/news', [HomeController::class, 'news'])->name('news');
-Route::get('/news/post/{id}', [HomeController::class, 'showPost'])->name('news.post');
+Route::get('/news', [HomeController::class, 'news'])->name('news'); // half check
+Route::get('/news/post/{id}', [HomeController::class, 'showPost'])->name('news.post'); // half check
 // Error page
-Route::get('/error', [HomeController::class, 'error'])->name('error');
+Route::get('/error/{status_code}', [HomeController::class, 'error'])->name('view.error'); // half check
 
 // INTRANET
 
@@ -36,11 +41,14 @@ Route::get('/intranet/login', [AuthController::class, 'showLogin'])->name('view.
 Route::post('/intranet/login', [AuthController::class, 'processLogin'])->name('submit.login'); // check
 // Logout
 Route::post('/intranet/logout', [AuthController::class, 'logout'])->name('submit.logout'); // check
+
+// forgot password
+Route::get('/intranet/password/forgot', [AuthController::class, 'showForgotPassword'])->name('view.forgot_password');
+Route::post('/intranet/password/forgot', [AuthController::class, 'processForgotPassword'])->name('submit.forgot_password');
+
 // reset password
 Route::get('/intranet/password/reset', [AuthController::class, 'showResetPassword'])->name('view.reset_password');
-Route::post('/intranet/password/reset', [AuthController::class, 'precessResetPassword'])->name('submit.reset_password');
-Route::get('/intranet/password/reset/{token}', [AuthController::class, 'showResetPasswordToken'])->name('view.reset_password_token');
-Route::post('/intranet/password/reset/{token}', [AuthController::class, 'processResetPasswordToken'])->name('submit.reset_password_token');
+Route::post('/intranet/password/reset/{token}', [AuthController::class, 'processResetPassword'])->name('submit.reset_password');
 
 // USER MANAGEMENT (ADMIN)
 
@@ -63,7 +71,6 @@ Route::get('/intranet/profile', [ProfileController::class, 'showProfile'])->name
 Route::post('/intranet/profile/edit', [ProfileController::class, 'updateProfile'])->name('submit.profile');
 
 // POSTS
-Route::get('/intranet/posts', [PostController::class, 'showPosts'])->name('view.posts');
 Route::get('/intranet/post/{id}', [PostController::class, 'showPost'])->name('view.post'); // check
 Route::post('/intranet/post/{id}', [PostController::class, 'changeStatus'])->name('submit.change_status'); // check
 Route::get('/intranet/add_post', [PostController::class, 'showCreatePost'])->name('view.add_post'); // check
@@ -71,15 +78,15 @@ Route::post('/intranet/add_post', [PostController::class, 'storePost'])->name('s
 Route::get('/intranet/edit_post/{id}', [PostController::class, 'showEditPost'])->name('view.edit_post');
 Route::post('/intranet/edit_post/{id}', [PostController::class, 'updatePost'])->name('submit.edit_post');
 Route::delete('/intranet/delete_post/{id}', [PostController::class, 'destroyPost'])->name('submit.delete_post');
-Route::get('/intranet/download_post/{id}', [PostController::class, 'downloadPost'])->name('download.post');
+Route::get('/intranet/download_post/{id}', [PostController::class, 'downloadPost'])->name('download.post'); // check
 
 // TEST ENDPOINTS
 
 // Test 1 - Send email
+Route::get('/test-email', [TestMailController::class, 'testMail'])->name('test.email');
 Route::get('/correo', [TestMailController::class, 'mostrarFormulario'])->name('formulario.correo');
 Route::post('/enviar-correo', [TestMailController::class, 'enviarCorreo'])->name('enviar.correo');
 Route::get('/run-migrations', function () {
     Artisan::call('migrate --force');
     return 'Migraciones ejecutadas correctamente.';
 })->name('run.migrations');
-

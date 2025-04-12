@@ -7,8 +7,14 @@
 @endsection
 
 @section('content')
-    <form method="POST" action="{{ route('submit.reset_password_token', ['token' => $token]) }}" class="form w-50 mt-5">
+    <form method="POST" action="{{ route('submit.reset_password', ['token' => $token]) }}" class="form w-50 mt-5">
         @csrf
+        <div class="mb-3">
+            <label for="email" class="form-label">{{ $emailLabel }}</label>
+            <div class="input-group d-flex mb-2">
+                <input type="email" class="form-control" id="email" name="email" value={{ $email }} required diabled>
+            </div>
+        </div>
         <div class="mb-3">
             <label for="password" class="form-label">{{ $passwordLabel }}</label>
             <div class="input-group d-flex mb-2">
@@ -21,7 +27,7 @@
         <div class="mb-3">
             <label for="password" class="form-label">{{ $confirmPasswordLabel }}</label>
             <div class="input-group d-flex mb-2">
-                <input type="password" class="form-control" id="password" name="password" required>
+                <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
                 <div id="togglePassword" class="bg-white d-flex align-items-center mr-2 border-0">
                     <i class="bi bi-eye-slash-fill text-primary"></i>
                 </div>
