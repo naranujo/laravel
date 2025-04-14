@@ -19,12 +19,12 @@ Route::fallback(function () {
 // Landing page
 Route::get('/', [HomeController::class, 'index'])->name('home'); // check
 // Subscription
-Route::post('/subscribe', [HomeController::class, 'storeSubscription'])->name('submit.subscribe');
+Route::post('/subscribe', [HomeController::class, 'storeSubscription'])->name('submit.subscribe'); // check
 // Newsletter
-Route::get('/news', [HomeController::class, 'news'])->name('news'); // half check
-Route::get('/news/post/{id}', [HomeController::class, 'showPost'])->name('news.post'); // half check
+Route::get('/news', [HomeController::class, 'news'])->name('news'); // check
+Route::get('/news/post/{id}', [HomeController::class, 'showPost'])->name('news.post'); // check
 // Error page
-Route::get('/error/{status_code}', [HomeController::class, 'error'])->name('view.error'); // half check
+Route::get('/error/{status_code}', [HomeController::class, 'error'])->name('view.error'); // check
 
 // INTRANET
 
@@ -34,8 +34,8 @@ Route::get('/intranet', [PostController::class, 'intranet'])->name('view.intrane
 // AUTHENTICATION
 
 // Register
-Route::get('/intranet/register', [AuthController::class, 'showRegister'])->name('view.register');
-Route::post('/intranet/register', [AuthController::class, 'processRegister'])->name('submit.register');
+Route::get('/intranet/register', [AuthController::class, 'showRegister'])->name('view.register'); // VEREMOS QUE HACEMOS CON ESTA!!!!!!!
+Route::post('/intranet/register', [AuthController::class, 'processRegister'])->name('submit.register'); // VEREMOS QUE HACEMOS CON ESTA!!!!!!!
 // Login
 Route::get('/intranet/login', [AuthController::class, 'showLogin'])->name('view.login'); // check
 Route::post('/intranet/login', [AuthController::class, 'processLogin'])->name('submit.login'); // check
@@ -43,12 +43,12 @@ Route::post('/intranet/login', [AuthController::class, 'processLogin'])->name('s
 Route::post('/intranet/logout', [AuthController::class, 'logout'])->name('submit.logout'); // check
 
 // forgot password
-Route::get('/intranet/password/forgot', [AuthController::class, 'showForgotPassword'])->name('view.forgot_password');
-Route::post('/intranet/password/forgot', [AuthController::class, 'processForgotPassword'])->name('submit.forgot_password');
+Route::get('/intranet/password/forgot', [AuthController::class, 'showForgotPassword'])->name('view.forgot_password'); // check
+Route::post('/intranet/password/forgot', [AuthController::class, 'processForgotPassword'])->name('submit.forgot_password'); // check
 
 // reset password
-Route::get('/intranet/password/reset', [AuthController::class, 'showResetPassword'])->name('view.reset_password');
-Route::post('/intranet/password/reset/{token}', [AuthController::class, 'processResetPassword'])->name('submit.reset_password');
+Route::get('/intranet/password/reset', [AuthController::class, 'showResetPassword'])->name('view.reset_password'); // check
+Route::post('/intranet/password/reset/{token}', [AuthController::class, 'processResetPassword'])->name('submit.reset_password'); // check
 
 // USER MANAGEMENT (ADMIN)
 

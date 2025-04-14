@@ -7,6 +7,12 @@
 @endsection
 
 @section('content')
+    {{-- Success --}}
+    @if (session('success'))
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ session('success') }}
+        </div>
+    @endif
     {{-- listar todos los posts --}}
     @if (count($posts) == 0)
         <h6 class="text-primary mx-auto">{{ $sinNovedades[$lang] }}</h6>

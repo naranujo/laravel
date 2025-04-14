@@ -4,12 +4,9 @@
 
 @endsection
 
-@section('title')
-    <h1 class="text-center text-white mt-1 pt-4">{{ $title }}</h1>
-@endsection
-
 @section('content')
     <section class="container" id="main">
+        <h1 class="mt-5 mb-5">{{ $title }}</h1>
         <!-- Inicio carrusel -->
         @if (count($carrouselPosts) == 0)
             <h6 class="text-primary mx-auto">{{ $sinNovedades[$lang] }}</h6>
@@ -60,7 +57,7 @@
                         @if ($index % 2 != 0)
                             <article class="col pr-0 text-primary mb-2">
                                 <hr class="mw-75 mx-auto" style="border: 5px solid #a99c6b;">
-                                <p class="text-primary mx-auto">{{ $novedades[$lang] }}</p>
+                                <p class="text-primary mx-auto">{{ $post->category_name }}</p>
                                 <h6 class="text-primary text-justify">{{ $post->title }}</h6>
                                 <div class="d-flex justify-content-between">
                                     <a href="/news/post/{{ $post->id }}" class="text-primary">{{ $leerMas[$lang] }}</a>
@@ -70,7 +67,7 @@
                         @else
                             <article class="col pl-0 text-primary mb-2">
                                 <hr class="mw-75 mx-auto" style="border: 5px solid #a99c6b;">
-                                <p class="text-primary mx-auto">{{ $novedades[$lang] }}</p>
+                                <p class="text-primary mx-auto">{{ $post->category_name }}</p>
                                 <h6 class="text-primary text-justify">{{ $post->title }}</h6>
                                 <div class="d-flex justify-content-between">
                                     <a href="/news/post/{{ $post->id }}" class="text-primary">{{ $leerMas[$lang] }}</a>
@@ -84,7 +81,7 @@
             </section>
             @if ($hasMorePosts)
                 <div class="d-flex justify-content-center">
-                    <a href="./?page={{ $page + 1 }}" class="btn border border-radius-25 text-white bg-primary w-25 mt-3 mb-3" id="cargar-mas">Cargar más</a>
+                    <a href="/news?limit={{ $limit + 1 }}&lang={{ $lang }}" class="btn border border-radius-25 text-white bg-primary w-25 mt-3 mb-3" id="cargar-mas">Cargar más</a>
                 </div>
             @endif
             <!-- Fin novedades -->

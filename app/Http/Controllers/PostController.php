@@ -251,15 +251,15 @@ class PostController extends Controller {
     }
 
     public function showPost($id) {
+        $lang = $this->lang ?? 'es';
+
         $post = Post::where('id', $id)
             ->with('sections')
             ->first();
 
         if (!$post) {
-            return redirect()->route('error', ['lang' => $this->lang]);
+            return redirect()->route('view.error', ['lang' => $this->lang, 'status_code' => 404]);
         }
-        
-        $lang = $this->lang ?? 'es';
 
         $loggedIn = session('user') != null;
         
@@ -373,7 +373,7 @@ class PostController extends Controller {
 
         $post = Post::find($id);
         if (!$post) {
-            return redirect()->route('error', ['lang' => $this->lang]);
+            return redirect()->route('view.error', ['lang' => $this->lang, 'status_code' => 404]);
         }
 
         try {
@@ -381,14 +381,103 @@ class PostController extends Controller {
             $post->save();
             return redirect()->route('view.post', ['lang' => $this->lang, 'id' => $post->id]);
         } catch (\Exception $e) {
-            return redirect()->route('error', ['lang' => $this->lang]);
+            return redirect()->route('view.error', ['lang' => $this->lang, 'status_code' => 500]);
         }
     }
 
-    public function showEditPost($id) {}
+    public function showEditPost($id) {
+        $lang = $this->lang ?? 'es';
+
+        $post = Post::with('sections')
+            ->find($id);
+
+        if (!$post) {
+            return redirect()->route('view.error', ['lang' => $this->lang, 'status_code' => 404]);
+        }
+
+        $loggedIn = session('user') != null;
+        
+        $role = $loggedIn ? session('user')->role : null;
+        
+        $homeLabel = [
+            'es' => 'Inicio',
+            'en' => 'Home',
+            'pt' => 'Início'
+        ];
+
+        $newPostLabel = [
+            'es' => 'Nuevo posteo',
+            'en' => 'New post',
+            'pt' => 'Nova postagem'
+        ];
+
+        $greetings = [
+            'es' => 'Hola ' . session('user')->first_name . ", bienvenido",
+            'en' => 'Hello ' . session('user')->first_name . ", welcome",
+            'pt' => 'Olá ' . session('user')->first_name . ", bem-vindo"
+        ];
+
+        $profileLabel = [
+            'es' => 'Perfil',
+            'en' => 'Profile',
+            'pt' => 'Perfil'
+        ];
+
+        $logoutLabel = [
+            'es' => 'Cerrar sesión',
+            'en' => 'Logout',
+            'pt' => 'Sair'
+        ];
+
+        $usersAdminLabel = [
+            'es' => 'Administración de usuarios',
+            'en' => 'Users management',
+            'pt' => 'Administração de usuários'
+        ];
+
+        $title = [
+            'es' => 'Editar posteo',
+            'en' => 'Edit post',
+            'pt' => 'Editar postagem'
+        ];
+
+        $description = [
+            'es' => 'Edita el posteo.',
+            'en' => 'Edit the post.',
+            'pt' => 'Edite a postagem.'
+        ];
+                
+        return view('intranet.edit_post', [
+            'lang' => $lang,
+            'title' => $title[$this->lang],
+            'description' => $description[$this->lang],
+            'loggedIn' => $loggedIn,
+            'role' => $role,
+            'homeLabel' => $homeLabel[$this->lang],
+            'newPostLabel' => $newPostLabel[$this->lang],
+            'greetings' => $greetings[$this->lang],
+            'profileLabel' => $profileLabel[$this->lang],
+            'logoutLabel' => $logoutLabel[$this->lang],
+            'usersAdminLabel' => $usersAdminLabel[$this->lang],
+            'post' => $post
+        ]);
+    }
+
     public function updatePost(Request $request, $id) {}
 
-    public function destroyPost($id) {}
+    public function destroyPost($id) {
+        $post = Post::find($id);
+        if (!$post) {
+            return redirect()->route('view.error', ['lang' => $this->lang, 'status_code' => 404]);
+        }
+
+        try {
+            $post->delete();
+            return redirect()->route('view.intranet', ['lang' => $this->lang])->with('success', 'Post eliminado correctamente.');
+        } catch (\Exception $e) {
+            return redirect()->route('view.error', ['lang' => $this->lang, 'status_code' => 500]);
+        }
+    }
 
     public function downloadPost($id) {
         $post = Post::find($id)
@@ -397,7 +486,7 @@ class PostController extends Controller {
         
         if (!$post) {
             // redirect to error page
-            return redirect()->route('error', ['lang' => $this->lang]);
+            return redirect()->route('view.error', ['lang' => $this->lang, 'status_code' => 404]);
         };
 
         $lang = $this->lang ?? 'es';

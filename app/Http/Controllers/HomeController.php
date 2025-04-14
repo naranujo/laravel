@@ -612,21 +612,33 @@ class HomeController extends Controller
         );
 
         $sinNovedades = [
-            'es' => 'No hay novedades',
-            'en' => 'No news'
+            'es' => 'No hay más novedades',
+            'en' => 'No news',
+            'pt' => 'Sem novidades'
         ];
     
         $novedades = [
             'es' => 'Novedades',
-            'en' => 'News'
+            'en' => 'News',
+            'pt' => 'Notícias'
         ];
     
         $leerMas = [
             'es' => 'Leer más',
-            'en' => 'Read more'
+            'en' => 'Read more',
+            'pt' => 'Leia mais'
         ];
-    
-        $page = 1;
+
+        if (isset($_GET['limit'])) {
+            $limit = $_GET['limit'];
+            try {
+                $limit = (int) $limit * 6; // Por defecto, 6 posts por página
+            } catch (Exception $e) {
+                $limit = 1 * 6; // Por defecto, 6 posts por página
+            }
+        } else {
+            $limit = 1 * 6;
+        }
         
         // Los 3 más nuevos
         $carrouselPosts = Post::where('status', 'published')
@@ -634,13 +646,13 @@ class HomeController extends Controller
             ->take(3)
             ->get();
             
-        // El resto (sin incluir los 3 más nuevos)
-        $remainingCount = Post::count() - 3;
         $posts = Post::where('status', 'published')
             ->orderBy('created_at', 'desc')
             ->skip(3)
-            ->take($remainingCount > 0 ? $remainingCount : 0)
+            ->take($limit)
             ->get();
+
+        $hasMorePosts = Post::where('status', 'published')->count() > ($limit + 3);
 
         foreach ($posts as $post) {
             $post->setAttribute('title', strip_tags($post->title));
@@ -652,6 +664,7 @@ class HomeController extends Controller
             $month_name = $months[$lang][$month] ?? $month; // Evita errores si $lang no está definido
             $post->setAttribute('formatted_created_at', $month_name . ' de ' . $year); // No modificar 'created_at));'
         }
+        
         foreach ($carrouselPosts as $post) {
             $post->setAttribute('title', strip_tags($post->title));
             $post->setAttribute('resume', ucfirst(mb_strimwidth(strip_tags($post->resume), 0, 150, '...')));
@@ -663,10 +676,6 @@ class HomeController extends Controller
             $month_name = $months[$lang][$month] ?? $month; // Evita errores si $lang no está definido
             $post->setAttribute('formatted_created_at', $month_name . ' de ' . $year); // No modificar 'created_at));'
         }
-        
-        $hasMorePosts = Post::count() > 5;
-
-        $page = 1;
 
         return view('news', compact(
             'lang',
@@ -685,21 +694,21 @@ class HomeController extends Controller
             'novedades',
             'leerMas',
             'hasMorePosts',
-            'page',
+            'limit',
         ));
     }
-
+    
     public function showPost($id) {
+        $lang = $_GET['lang'] ?? 'es';
+
         $post = Post::where('id', $id)
             ->with('sections')
             ->first();
 
         if (!$post) {
-            return redirect()->route('view.error', ['lang' => $this->lang]);
+            return redirect()->route('view.error', ['lang' => $lang, 'status_code' => 404]);
         }
         
-        $lang = $this->lang ?? 'es';
-
         $title = [
             'es' => 'Posteo',
             'en' => 'Post',
@@ -1030,5 +1039,47 @@ class HomeController extends Controller
             'title' => $title,
             'description' => $description,
         ]);
+    }
+
+    public function storeSubscription(Request $request) {
+
+        $lang = $_GET['lang'] ?? 'es';
+
+        $success = array(
+            'es' => 'Gracias por suscribirte a nuestro newsletter.',
+            'en' => 'Thank you for subscribing to our newsletter.',
+            'pt' => 'Obrigado por se inscrever em nosso boletim informativo.',
+        );
+
+        // email ya existe
+        $existingSubscription = [
+            'es' => 'El email ya existe.',
+            'en' => 'The email already exists.',
+            'pt' => 'O e-mail já existe.',
+        ];
+
+        $error = array(
+            'es' => 'Hubo un error al suscribirte.',
+            'en' => 'There was an error subscribing you.',
+            'pt' => 'Houve um erro ao se inscrever.',
+        );
+
+        $request->validate([
+            'email' => 'required|email',
+        ]);
+
+        try {
+            $subscription = new Subscription();
+            $subscription->email = $request->input('email');
+            $subscription->save();
+            
+            return redirect()->back()->with('success', $success[$lang])->withFragment('newsletter');
+        } catch (\Exception $e) {
+            if ($e->getCode() == 23000) { // Error de duplicado
+                return redirect()->back()->with('error', $existingSubscription[$lang])->withFragment('newsletter');
+            } else {
+                return redirect()->back()->with('error', $error[$lang])->withFragment('newsletter');
+            }
+        }
     }
 }
